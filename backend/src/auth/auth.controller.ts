@@ -16,11 +16,13 @@ export class AuthController {
     // Helper to set cookies
     private setCookies(response: any, tokens: { accessToken: string; refreshToken: string }) {
         const isProd = process.env.NODE_ENV === 'production';
+        // Use 'none' in production for cross-origin (Vercel <-> Render), 'lax' locally
+        const sameSitePolicy = isProd ? 'none' as const : 'lax' as const;
 
         response.cookie('access_token', tokens.accessToken, {
             httpOnly: true,
             secure: isProd,
-            sameSite: 'lax',
+            sameSite: sameSitePolicy,
             path: '/',
             maxAge: 15 * 60 * 1000, // 15m
         });
@@ -28,16 +30,16 @@ export class AuthController {
         response.cookie('refresh_token', tokens.refreshToken, {
             httpOnly: true,
             secure: isProd,
-            sameSite: 'lax',
+            sameSite: sameSitePolicy,
             path: '/api/auth/refresh', // Scoped to refresh endpoint
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
         });
 
         // Readable "logged_in" cookie for middleware to know session exists
         response.cookie('is_authenticated', 'true', {
-            httpOnly: false, // JS Readable (optional, but good for client to know state too)
+            httpOnly: false,
             secure: isProd,
-            sameSite: 'lax',
+            sameSite: sameSitePolicy,
             path: '/',
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7d matches refresh token
         });
@@ -45,9 +47,9 @@ export class AuthController {
         // Rotate CSRF Token
         const csrfToken = crypto.randomUUID();
         response.cookie('csrf_token', csrfToken, {
-            httpOnly: false, // JS Readable
+            httpOnly: false,
             secure: isProd,
-            sameSite: 'lax',
+            sameSite: sameSitePolicy,
             path: '/',
         });
 
@@ -60,11 +62,12 @@ export class AuthController {
     getCsrfToken(@Res({ passthrough: true }) response: any) {
         const csrfToken = crypto.randomUUID();
         const isProd = process.env.NODE_ENV === 'production';
+        const sameSitePolicy = isProd ? 'none' as const : 'lax' as const;
 
         response.cookie('csrf_token', csrfToken, {
             httpOnly: false,
             secure: isProd,
-            sameSite: 'lax',
+            sameSite: sameSitePolicy,
             path: '/',
         });
 
@@ -138,10 +141,11 @@ export class AuthController {
 
         // Clear all cookies
         const isProd = process.env.NODE_ENV === 'production';
+        const sameSitePolicy = isProd ? 'none' as const : 'lax' as const;
         const clearOptions = {
             httpOnly: true,
             secure: isProd,
-            sameSite: 'lax' as const,
+            sameSite: sameSitePolicy,
             path: '/',
         };
 
