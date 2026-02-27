@@ -141,15 +141,9 @@ const PdfPage = React.memo(({ pageNumber, resourceId, width, height, scale, isVi
                 />
             </div>
 
-            {/* 6. ANNOTATION LAYER (uses explicit layoutZoom) */}
-            <div className="absolute inset-0 z-[6]">
-                <AnnotationLayer
-                    pageNumber={pageNumber}
-                    displayWidth={width}
-                    layoutZoom={scale}
-                    isVisible={isVisible}
-                />
-            </div>
+            {/* 6. ANNOTATION LAYER (Server-rendered images do not have raw PDF page/viewport data here) */}
+            {/* Annotation layer requires pdf.js page and viewport objects which we don't have in the image-based viewer */}
+            {/* To support links, we would need to fetch annotation data separately from the server */}
 
             {/* Page Number */}
             <div className="absolute bottom-2 right-2 text-[10px] text-gray-400 font-mono pointer-events-none z-30 mix-blend-multiply dark:mix-blend-normal">

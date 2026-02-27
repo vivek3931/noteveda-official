@@ -31,7 +31,7 @@ const CurvedGallery: React.FC<CurvedGalleryProps> = ({
     const scrollStartX = useRef(0);
     const velocityRef = useRef(0);
     const lastXRef = useRef(0);
-    const animationRef = useRef<number>();
+    const animationRef = useRef<number>(0);
 
     // Scroll position with spring physics
     const scrollX = useMotionValue(0);

@@ -69,10 +69,10 @@ export const ResourceDetails: React.FC<ResourceDetailsProps> = ({
 
                 <div className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div className="w-10 h-10 rounded-full bg-black dark:bg-white text-white dark:text-black flex items-center justify-center font-bold text-sm">
-                        {resource.author?.name?.charAt(0).toUpperCase() || 'U'}
+                        {typeof resource.author === 'object' ? (resource.author.name?.charAt(0).toUpperCase() || 'U') : (typeof resource.author === 'string' ? resource.author.charAt(0).toUpperCase() : 'U')}
                     </div>
                     <div>
-                        <span className="block font-medium text-gray-900 dark:text-white text-sm">{resource.author?.name || 'Unknown'}</span>
+                        <span className="block font-medium text-gray-900 dark:text-white text-sm">{typeof resource.author === 'object' ? (resource.author.name || 'Unknown') : (typeof resource.author === 'string' ? resource.author : 'Unknown')}</span>
                         <span className="text-xs text-gray-500">Contributor</span>
                     </div>
                 </div>

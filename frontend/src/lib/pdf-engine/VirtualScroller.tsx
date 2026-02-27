@@ -221,7 +221,7 @@ const VirtualScroller = memo(forwardRef<VirtualScrollerRef, VirtualScrollerProps
     // ============================================
     // Reverted to Ratio-Based Anchoring as requested
     useScrollAnchoring(
-        useWindowScroll ? { current: typeof window !== 'undefined' ? document.documentElement : null } : scrollContainerRef,
+        (useWindowScroll ? { current: typeof window !== 'undefined' ? document.documentElement : null } : scrollContainerRef) as React.RefObject<HTMLElement>,
         [basePageDimensions.height, totalPages, pageGap],
         isResizing
     );

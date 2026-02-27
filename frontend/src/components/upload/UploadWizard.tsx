@@ -50,7 +50,7 @@ export function UploadForm({ onSubmit, isSubmitting = false }: UploadFormProps) 
     const previousCategory = useRef<ResourceCategory | null>(null);
 
     const form = useForm<ResourceFormData>({
-        resolver: zodResolver(resourceFormSchema),
+        resolver: zodResolver(resourceFormSchema) as any,
         mode: 'onChange',
         defaultValues: {
             title: '',

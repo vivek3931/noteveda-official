@@ -58,6 +58,8 @@ export interface Resource {
     tags: string[];
     status: ResourceStatus;
     pages?: number;
+    fileSize?: number;
+    viewCount?: number;
     author: string | {
         id: string;
         name: string;

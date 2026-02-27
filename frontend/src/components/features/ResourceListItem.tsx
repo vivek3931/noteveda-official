@@ -159,7 +159,7 @@ const ResourceListItem: React.FC<ResourceListItemProps> = ({ resource, index = 0
                 <div className="flex items-center justify-between mt-auto pt-2 md:pt-0 border-t md:border-t-0 border-gray-100 dark:border-gray-800">
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-2">
-                            {resource.author?.avatar ? (
+                            {typeof resource.author === 'object' && resource.author.avatar ? (
                                 <Image
                                     src={resource.author.avatar}
                                     alt={resource.author.name}
@@ -169,11 +169,11 @@ const ResourceListItem: React.FC<ResourceListItemProps> = ({ resource, index = 0
                                 />
                             ) : (
                                 <div className="w-6 h-6 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center text-[10px] font-bold text-gray-600 dark:text-gray-300">
-                                    {resource.author?.name?.charAt(0) || '?'}
+                                    {(typeof resource.author === 'object' ? resource.author.name?.charAt(0) : resource.author.charAt(0)) || '?'}
                                 </div>
                             )}
                             <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-                                {resource.author?.name || 'Anonymous'}
+                                {(typeof resource.author === 'object' ? resource.author.name : resource.author) || 'Anonymous'}
                             </span>
                         </div>
                     </div>
