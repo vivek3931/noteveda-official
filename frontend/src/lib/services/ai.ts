@@ -1,4 +1,4 @@
-import api from '../api';
+import api, { getCsrfToken } from '../api';
 
 interface ChatResponse {
     role: 'ai' | 'user';
@@ -21,13 +21,6 @@ export const aiService = {
         api.post<ChatResponse>('/ai/chat', data),
 
     chatStream: async (data: ChatRequest) => {
-        // Get CSRF Token from Cookie (same as api.ts)
-        const getCsrfToken = (): string | null => {
-            if (typeof document === 'undefined') return null;
-            const match = document.cookie.match(new RegExp('(^| )csrf_token=([^;]+)'));
-            return match ? decodeURIComponent(match[2]) : null;
-        };
-
         const csrfToken = getCsrfToken();
         const headers: Record<string, string> = {
             'Content-Type': 'application/json',

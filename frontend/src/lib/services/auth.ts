@@ -1,5 +1,5 @@
 // Auth API Service
-import api from '../api';
+import api, { setCsrfToken } from '../api';
 import { User } from '@/types';
 
 export interface LoginCredentials {
@@ -38,9 +38,14 @@ export const authService = {
     logout: (): Promise<void> =>
         api.post<void>('/auth/logout'),
 
-    // Get CSRF Token (Bootstrapping)
-    getCsrfToken: (): Promise<{ csrfToken: string }> =>
-        api.get<{ csrfToken: string }>('/auth/csrf'),
+    // Get CSRF Token (Bootstrapping) — stores in memory for cross-origin fallback
+    getCsrfToken: async (): Promise<{ csrfToken: string }> => {
+        const result = await api.get<{ csrfToken: string }>('/auth/csrf');
+        if (result.csrfToken) {
+            setCsrfToken(result.csrfToken);
+        }
+        return result;
+    },
 
     // Update profile
     updateProfile: (data: Partial<User>): Promise<User> =>

@@ -25,11 +25,23 @@ const processQueue = (error: any, success: boolean = false) => {
     failedQueue = [];
 };
 
-// Helper: Get CSRF Token from Cookie
-const getCsrfToken = (): string | null => {
-    if (typeof document === 'undefined') return null;
-    const match = document.cookie.match(new RegExp('(^| )csrf_token=([^;]+)'));
-    return match ? decodeURIComponent(match[2]) : null;
+// In-memory CSRF token fallback (for cross-origin where cookies may not be stored)
+let csrfTokenInMemory: string | null = null;
+
+// Store CSRF token from API response (called by auth service)
+export const setCsrfToken = (token: string) => {
+    csrfTokenInMemory = token;
+};
+
+// Helper: Get CSRF Token from Cookie or in-memory fallback
+export const getCsrfToken = (): string | null => {
+    // Try cookie first
+    if (typeof document !== 'undefined') {
+        const match = document.cookie.match(new RegExp('(^| )csrf_token=([^;]+)'));
+        if (match) return decodeURIComponent(match[2]);
+    }
+    // Fallback to in-memory token (essential for cross-origin)
+    return csrfTokenInMemory;
 };
 
 // Generic fetch wrapper with error handling and token refresh
