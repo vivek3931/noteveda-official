@@ -37,7 +37,7 @@ export const aiService = {
             headers['X-CSRF-TOKEN'] = csrfToken;
         }
 
-        const url = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api'}/ai/stream`;
+        const url = `${process.env.NEXT_PUBLIC_API_URL || ''}/ai/stream`;
         console.log('[AI Stream] Connecting to:', url);
 
         const response = await fetch(url, {

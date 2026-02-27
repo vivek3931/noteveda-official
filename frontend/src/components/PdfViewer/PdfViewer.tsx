@@ -7,7 +7,7 @@ import PdfPage from './PdfPage';
 import InnerPdfToolbar from './InnerPdfToolbar';
 import MobileBottomBar from './MobileBottomBar';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 interface PdfMetadata {
     totalPages: number;

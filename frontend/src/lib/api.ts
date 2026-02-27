@@ -1,7 +1,7 @@
 // API Client for Noteveda Frontend
 // Centralized API configuration and helper functions
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
 interface CustomRequestInit extends RequestInit {
     _retry?: boolean;

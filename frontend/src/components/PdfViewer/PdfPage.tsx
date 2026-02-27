@@ -11,7 +11,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import TextLayer from './TextLayer';
 import AnnotationLayer from '@/lib/pdf-engine/layers/AnnotationLayer';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
 
 interface PdfPageProps {
     pageNumber: number;
