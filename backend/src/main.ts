@@ -17,8 +17,24 @@ async function bootstrap() {
   app.use(cookieParser());
 
   // CORS
+  const allowedOrigins = [
+    'https://noteveda.com',
+    'https://www.noteveda.com',
+    'https://noteveda.vercel.app',
+    'http://localhost:3000',
+    'http://localhost:3001',
+    configService.get<string>('cors.frontendUrl'),
+  ].filter(Boolean) as string[];
+
   app.enableCors({
-    origin: configService.get<string>('cors.frontendUrl'),
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      // Allow requests with no origin (mobile apps, curl, etc.)
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
   });
 
