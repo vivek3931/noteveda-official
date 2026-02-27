@@ -545,7 +545,7 @@ function AIFeatureHighlightsSection() {
     }, [activeIndex, isInView]);
 
     // Response line animation
-    const lineVariants = {
+    const lineVariants: import('framer-motion').Variants = {
         hidden: { opacity: 0, y: 6 },
         visible: (i: number) => ({
             opacity: 1,
@@ -753,7 +753,7 @@ function UploadShareSection() {
                             animate={{
                                 maskSize: ['0% 0%', '200% 200%'],
                                 WebkitMaskSize: ['0% 0%', '200% 200%'],
-                            }}
+                            } as any}
                             transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
                         />
 
@@ -1116,7 +1116,7 @@ function FinalCTASection() {
                         animate={{
                             maskPosition: ['-50% 0', '150% 0'],
                             WebkitMaskPosition: ['-50% 0', '150% 0']
-                        }}
+                        } as any}
                         transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                     />
 
