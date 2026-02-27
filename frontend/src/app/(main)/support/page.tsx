@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supportService, CreateTicketDTO } from '@/lib/services/support';
 import { SupportTicket, FAQ } from '@/lib/services/admin';
 import { format } from 'date-fns';
-import { AlertCircle, CheckCircle, Clock, MessageSquare, Plus, ChevronDown, ChevronUp, Search, X } from 'lucide-react';
+import { AlertIcon, CheckIcon, ClockIcon, MessageIcon, PlusIcon, ChevronDownIcon, ChevronUpIcon, SearchIcon, CloseIcon } from '@/components/icons';
 import Link from 'next/link';
 
 export default function SupportPage() {
@@ -77,7 +77,7 @@ export default function SupportPage() {
                         onClick={() => setShowCreateModal(true)}
                         className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2 font-medium"
                     >
-                        <Plus size={18} /> New Ticket
+                        <PlusIcon size={18} /> New Ticket
                     </button>
                 )}
             </header>
@@ -105,7 +105,7 @@ export default function SupportPage() {
                     <div className="space-y-4">
                         {tickets.length === 0 ? (
                             <div className="text-center py-20 bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
-                                <MessageSquare className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                                <MessageIcon size={48} className="text-gray-400 mx-auto mb-4" />
                                 <h3 className="text-lg font-medium text-gray-900 dark:text-white">No tickets yet</h3>
                                 <p className="text-gray-500 mb-6">Need help? Create a new support ticket.</p>
                                 <button onClick={() => setShowCreateModal(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Create Ticket</button>
@@ -120,13 +120,13 @@ export default function SupportPage() {
                                                 <span className={`text-xs font-medium px-2 py-0.5 rounded border ${ticket.priority === 'URGENT' ? 'border-red-200 text-red-600 bg-red-50' : 'border-gray-200 text-gray-500'}`}>
                                                     {ticket.priority}
                                                 </span>
-                                                <span className="text-xs text-gray-400 flex items-center gap-1"><Clock size={12} /> {format(new Date(ticket.createdAt), 'MMM d, yyyy')}</span>
+                                                <span className="text-xs text-gray-400 flex items-center gap-1"><ClockIcon size={12} /> {format(new Date(ticket.createdAt), 'MMM d, yyyy')}</span>
                                             </div>
                                             <h3 className="text-lg font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 transition-colors">{ticket.subject}</h3>
                                             <p className="text-sm text-gray-500 mt-1 line-clamp-1">{ticket.message}</p>
                                         </div>
                                         <div className="text-gray-400 group-hover:translate-x-1 transition-transform">
-                                            <ChevronDown className="-rotate-90" />
+                                            <ChevronDownIcon className="-rotate-90" />
                                         </div>
                                     </div>
                                 </Link>
@@ -155,7 +155,7 @@ export default function SupportPage() {
                         >
                             <div className="p-6 border-b border-gray-100 dark:border-gray-700 flex justify-between items-center">
                                 <h2 className="text-xl font-bold dark:text-white">Create Support Ticket</h2>
-                                <button onClick={() => setShowCreateModal(false)}><X size={20} className="text-gray-500" /></button>
+                                <button onClick={() => setShowCreateModal(false)}><CloseIcon size={20} className="text-gray-500" /></button>
                             </div>
                             <form onSubmit={handleCreateTicket} className="p-6 space-y-4">
                                 <div>
@@ -216,7 +216,7 @@ function FAQItem({ faq }: { faq: FAQ }) {
         <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
             <button onClick={() => setIsOpen(!isOpen)} className="w-full text-left px-6 py-4 flex justify-between items-center hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
                 <span className="font-medium text-gray-900 dark:text-white">{faq.question}</span>
-                {isOpen ? <ChevronUp size={18} className="text-gray-500" /> : <ChevronDown size={18} className="text-gray-500" />}
+                {isOpen ? <ChevronUpIcon size={18} className="text-gray-500" /> : <ChevronDownIcon size={18} className="text-gray-500" />}
             </button>
             <AnimatePresence>
                 {isOpen && (
