@@ -17,13 +17,15 @@ async function bootstrap() {
   app.use(cookieParser());
 
   // CORS
+  const additionalOrigins = process.env.CORS_ALLOWED_ORIGINS
+    ? process.env.CORS_ALLOWED_ORIGINS.split(',').map(o => o.trim())
+    : [];
   const allowedOrigins = [
     'https://noteveda.com',
     'https://www.noteveda.com',
     'https://noteveda.vercel.app',
-    'http://localhost:3000',
-    'http://localhost:3001',
     configService.get<string>('cors.frontendUrl'),
+    ...additionalOrigins,
   ].filter(Boolean) as string[];
 
   app.enableCors({
