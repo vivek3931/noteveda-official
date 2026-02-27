@@ -50,15 +50,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }, []);
 
     const login = async (credentials: LoginCredentials) => {
-        const response = await authService.login(credentials);
-        setUser(response.user);
-        // Navigation handled by the calling page
+        try {
+            const response = await authService.login(credentials);
+            setUser(response.user);
+        } catch (error: any) {
+            // If CSRF token is invalid/missing, re-fetch and retry once
+            if (error?.message?.includes('CSRF')) {
+                await authService.getCsrfToken();
+                const response = await authService.login(credentials);
+                setUser(response.user);
+                return;
+            }
+            throw error;
+        }
     };
 
     const register = async (data: RegisterData) => {
-        const response = await authService.register(data);
-        setUser(response.user);
-        // Navigation handled by the calling page
+        try {
+            const response = await authService.register(data);
+            setUser(response.user);
+        } catch (error: any) {
+            if (error?.message?.includes('CSRF')) {
+                await authService.getCsrfToken();
+                const response = await authService.register(data);
+                setUser(response.user);
+                return;
+            }
+            throw error;
+        }
     };
 
     const logout = useCallback(async () => {
