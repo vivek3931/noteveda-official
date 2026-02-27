@@ -56,10 +56,7 @@ export const skillMetadataSchema = z.object({
         .min(1, 'Topic is required')
         .max(100, 'Topic name too long')
         .transform((val) => val.trim()),
-    level: z.enum(['Beginner', 'Intermediate', 'Advanced'], {
-        required_error: 'Level is required',
-        invalid_type_error: 'Invalid level selected',
-    }),
+    level: z.enum(['Beginner', 'Intermediate', 'Advanced']),
     format: z.string().optional().transform((val) => val?.trim() || undefined),
     skillCategory: z.string().optional().transform((val) => val?.trim() || undefined),
 });
