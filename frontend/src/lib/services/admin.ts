@@ -157,6 +157,7 @@ export interface TicketMessage {
         role: string;
     };
     message: string;
+    isAdmin?: boolean;
     createdAt: string;
 }
 
