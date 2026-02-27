@@ -1,0 +1,312 @@
+/* Google Fonts Import - MUST be first */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===================================
+   Base Layer Customizations
+   =================================== */
+@layer base {
+  html {
+    @apply scroll-smooth antialiased;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    @apply text-base text-gray-900 bg-white min-h-screen overflow-x-hidden;
+    @apply dark:bg-gray-950 dark:text-gray-100;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Outfit', 'Inter', sans-serif;
+    @apply font-bold tracking-tight;
+    @apply dark:text-white;
+  }
+
+  h1 {
+    @apply text-5xl;
+  }
+
+  h2 {
+    @apply text-4xl;
+  }
+
+  h3 {
+    @apply text-3xl;
+  }
+
+  h4 {
+    @apply text-2xl;
+  }
+
+  h5 {
+    @apply text-xl;
+  }
+
+  h6 {
+    @apply text-lg;
+  }
+
+  a {
+    @apply text-inherit no-underline transition-colors duration-150;
+  }
+
+  a:hover {
+    @apply text-gray-600 dark:text-gray-300;
+  }
+
+  @media (max-width: 768px) {
+    h1 {
+      @apply text-4xl;
+    }
+
+    h2 {
+      @apply text-3xl;
+    }
+
+    h3 {
+      @apply text-2xl;
+    }
+
+    h4 {
+      @apply text-xl;
+    }
+  }
+}
+
+/* ===================================
+   Component Classes
+   =================================== */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 text-sm font-medium px-6 py-3 rounded-lg border border-transparent cursor-pointer transition-all duration-200 whitespace-nowrap;
+  }
+
+  .btn:disabled {
+    @apply opacity-50 cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply bg-black text-white border-black;
+    @apply dark:bg-white dark:text-black dark:border-white;
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    @apply bg-gray-800 border-gray-800 -translate-y-0.5 shadow-md;
+    @apply dark:bg-gray-200 dark:border-gray-200;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent text-black border-gray-300;
+    @apply dark:text-white dark:border-gray-600;
+  }
+
+  .btn-secondary:hover:not(:disabled) {
+    @apply bg-gray-100 border-gray-400;
+    @apply dark:bg-gray-800 dark:border-gray-500;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-gray-600 border-transparent;
+    @apply dark:text-gray-400;
+  }
+
+  .btn-ghost:hover:not(:disabled) {
+    @apply bg-gray-100 text-black;
+    @apply dark:bg-gray-800 dark:text-white;
+  }
+
+  .btn-lg {
+    @apply px-8 py-4 text-base;
+  }
+
+  .btn-sm {
+    @apply px-4 py-2 text-xs;
+  }
+
+  .card {
+    @apply bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-200;
+    @apply dark:bg-gray-900 dark:border-gray-800;
+  }
+
+  .card:hover {
+    @apply border-gray-300 shadow-xl -translate-y-1;
+    @apply dark:border-gray-700 dark:shadow-2xl dark:shadow-black/50;
+  }
+
+  .input {
+    @apply w-full text-base px-4 py-3 border border-gray-200 rounded-lg bg-white text-gray-900 transition-all duration-150 outline-none;
+    @apply dark:bg-gray-900 dark:border-gray-700 dark:text-white;
+  }
+
+  .input:focus {
+    @apply border-black ring-2 ring-black/10;
+    @apply dark:border-white dark:ring-white/10;
+  }
+
+  .input::placeholder {
+    @apply text-gray-400;
+    @apply dark:text-gray-500;
+  }
+
+  .badge {
+    @apply inline-flex items-center text-xs font-medium px-3 py-1 rounded-full bg-gray-100 text-gray-600;
+    @apply dark:bg-gray-800 dark:text-gray-300;
+  }
+
+  .badge-dark {
+    @apply bg-black text-white;
+    @apply dark:bg-white dark:text-black;
+  }
+
+  .container {
+    @apply w-full max-w-7xl mx-auto px-6;
+  }
+
+  .glass {
+    @apply bg-black/80 backdrop-blur-xl border border-white/10;
+    @apply dark:bg-white/10 dark:border-white/20;
+  }
+
+  .skeleton {
+    @apply bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 animate-pulse rounded-lg;
+    @apply dark:from-gray-800 dark:via-gray-700 dark:to-gray-800;
+  }
+}
+
+/* ===================================
+   Utilities
+   =================================== */
+@layer utilities {
+  .font-display {
+    font-family: 'Outfit', 'Inter', sans-serif;
+  }
+
+  .font-primary {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+
+  /* Background utilities for dark mode */
+  .bg-page {
+    @apply bg-gray-50 dark:bg-gray-950;
+  }
+
+  .bg-card {
+    @apply bg-white dark:bg-gray-900;
+  }
+
+  .border-subtle {
+    @apply border-gray-200 dark:border-gray-800;
+  }
+
+  .text-muted {
+    @apply text-gray-500 dark:text-gray-400;
+  }
+
+  /* Hide scrollbar for horizontal scroll sections */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f5f5f5;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #171717;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #a3a3a3;
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #525252;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #737373;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #737373;
+}
+
+/* ===================================
+   PDF Text Layer Selection Styles
+   =================================== */
+/* Text layer container - allows selection */
+.pdf-text-layer {
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  cursor: text;
+}
+
+/* Text layer spans are invisible but selectable */
+.pdf-text-layer span {
+  color: transparent !important;
+  background: transparent;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  cursor: text;
+}
+
+/* Selection highlight - text stays invisible, only background shows */
+.pdf-text-layer span::selection {
+  color: transparent !important;
+  background: rgba(59, 130, 246, 0.4) !important;
+}
+
+.pdf-text-layer span::-moz-selection {
+  color: transparent !important;
+  background: rgba(59, 130, 246, 0.4) !important;
+}
+
+.dark .pdf-text-layer span::selection {
+  color: transparent !important;
+  background: rgba(96, 165, 250, 0.5) !important;
+}
+
+.dark .pdf-text-layer span::-moz-selection {
+  color: transparent !important;
+  background: rgba(96, 165, 250, 0.5) !important;
+}
+
+/* ===================================
+   PDF Link Annotation Styles
+   =================================== */
+.pdf-link {
+  cursor: pointer !important;
+}
+
+.pdf-link:hover {
+  background-color: rgba(59, 130, 246, 0.15) !important;
+  outline: 2px solid rgba(59, 130, 246, 0.4) !important;
+  outline-offset: -1px;
+}
+
+.dark .pdf-link:hover {
+  background-color: rgba(96, 165, 250, 0.2) !important;
+  outline: 2px solid rgba(96, 165, 250, 0.5) !important;
+}

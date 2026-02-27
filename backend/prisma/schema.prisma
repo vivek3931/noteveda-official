@@ -1,0 +1,454 @@
+// Prisma Schema for Noteveda
+// PostgreSQL database with full-text search support
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============ USERS ============
+model User {
+  id              String         @id @default(cuid())
+  email           String         @unique
+  password        String
+  name            String
+  avatar          String?
+  role            Role           @default(USER)
+  dailyCredits    Int            @default(5)
+  uploadCredits   Int            @default(0)
+  lastCreditReset DateTime       @default(now())
+  isActive        Boolean        @default(true)
+  subscription    Subscription?
+  payments        Payment[]
+  uploads         Resource[]     @relation("UserUploads")
+  downloads       Download[]
+  refreshTokens   RefreshToken[]
+  reportsMade     Report[]       @relation("UserReports")
+  adminActions    AuditLog[]     @relation("AdminActions")
+  aiRequests      AIRequestLog[]
+  ticketsCreated  SupportTicket[] @relation("UserTickets")
+  ticketMessages  TicketMessage[]
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  @@index([email])
+  @@index([role])
+  @@index([isActive])
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([token])
+}
+
+model Subscription {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId    String
+  plan      Plan     @relation(fields: [planId], references: [id])
+  startDate DateTime @default(now())
+  endDate   DateTime
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([active])
+}
+
+// ============ RESOURCES ============
+
+// Resource Category for polymorphic resource handling
+enum ResourceCategory {
+  ACADEMIC      // University/College (B.Sc, B.Tech, MBA)
+  ENTRANCE      // Competitive Exams (GATE, JEE, NEET, CAT, UPSC)
+  SKILL         // Career/Skills (Programming, Design, Marketing)
+  GENERAL       // Miscellaneous
+}
+
+model Resource {
+  id            String           @id @default(cuid())
+  title         String
+  description   String           @db.Text
+  fileUrl       String
+  fileHash      String           @unique
+  fileSize      Int
+  fileType      FileType
+  thumbnailUrl  String?
+  
+  // Legacy fields for backward compatibility
+  domain        String
+  subDomain     String
+  stream        String?
+  subject       String
+  resourceType  ResourceType
+  
+  // New polymorphic fields
+  category      ResourceCategory @default(ACADEMIC)
+  metadata      Json?            // Stores category-specific data as JSON
+  
+  tags          String[]
+  status        Status           @default(APPROVED)  // Auto-approved on upload
+  authorId      String
+  author        User             @relation("UserUploads", fields: [authorId], references: [id])
+  downloads     Download[]
+  viewCount     Int              @default(0)
+  downloadCount Int              @default(0)
+  
+  // Moderation fields
+  isHidden      Boolean          @default(false)
+  isAutoDeleted Boolean          @default(false)
+  reportCount   Int              @default(0)
+  reports       Report[]
+  
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+
+  @@index([authorId])
+  @@index([domain])
+  @@index([subDomain])
+  @@index([subject])
+  @@index([status])
+  @@index([resourceType])
+  @@index([category])
+  @@index([isHidden])
+  @@index([reportCount])
+  @@index([createdAt(sort: Desc)])
+}
+
+model Download {
+  id         String   @id @default(cuid())
+  userId     String
+  resourceId String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  resource   Resource @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, resourceId])
+  @@index([userId])
+  @@index([resourceId])
+}
+
+// ============ CATEGORIES ============
+model Domain {
+  id         String      @id @default(cuid())
+  name       String      @unique
+  slug       String      @unique
+  subDomains SubDomain[]
+  createdAt  DateTime    @default(now())
+}
+
+model SubDomain {
+  id       String   @id @default(cuid())
+  name     String
+  slug     String
+  domainId String
+  domain   Domain   @relation(fields: [domainId], references: [id], onDelete: Cascade)
+  streams  Stream[]
+
+  @@unique([domainId, slug])
+  @@index([domainId])
+}
+
+model Stream {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String
+  subDomainId String
+  subDomain   SubDomain @relation(fields: [subDomainId], references: [id], onDelete: Cascade)
+  subjects    Subject[]
+
+  @@unique([subDomainId, slug])
+  @@index([subDomainId])
+}
+
+model Subject {
+  id       String @id @default(cuid())
+  name     String
+  slug     String
+  streamId String
+  stream   Stream @relation(fields: [streamId], references: [id], onDelete: Cascade)
+
+  @@unique([streamId, slug])
+  @@index([streamId])
+}
+
+model Payment {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  orderId         String   @unique
+  paymentId       String?
+  signature       String?
+  amount          Float
+  currency        String   @default("INR")
+  status          String
+  planId          String?
+  plan            Plan?    @relation(fields: [planId], references: [id])
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// ============ ENUMS ============
+enum Role {
+  USER
+  ADMIN
+}
+
+
+model Plan {
+  id          String          @id @default(cuid())
+  name        String
+  description String
+  price       Float
+  currency    String          @default("INR")
+  interval    BillingInterval
+  features    String[]
+  badge       String?
+  highlighted Boolean         @default(false)
+  cta         String
+  ctaLink     String
+  isActive    Boolean         @default(true)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+  subscriptions Subscription[]
+  payments      Payment[]
+
+  @@index([isActive])
+}
+
+enum BillingInterval {
+  MONTHLY
+  YEARLY
+  LIFETIME
+}
+
+enum Status {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum FileType {
+  PDF
+  DOCX
+  TXT
+}
+
+enum ResourceType {
+  NOTES
+  GUIDE
+  PYQ
+  SOLUTION
+}
+
+// ============ ADMIN & MODERATION ============
+
+model Report {
+  id          String       @id @default(cuid())
+  resourceId  String
+  resource    Resource     @relation(fields: [resourceId], references: [id], onDelete: Cascade)
+  reporterId  String
+  reporter    User         @relation("UserReports", fields: [reporterId], references: [id])
+  reason      ReportReason
+  description String?
+  status      ReportStatus @default(PENDING)
+  createdAt   DateTime     @default(now())
+  
+  @@index([resourceId])
+  @@index([reporterId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+enum ReportReason {
+  SPAM
+  INAPPROPRIATE
+  COPYRIGHT
+  LOW_QUALITY
+  DUPLICATE
+  MISLEADING
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  DISMISSED
+  ACTIONED
+}
+
+model SystemSetting {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  value     String
+  type      String   @default("string") // string, number, boolean, json
+  category  String   @default("general")
+  label     String?  // Human-readable label
+  updatedAt DateTime @updatedAt
+  
+  @@index([category])
+}
+
+// ============ AI CONTROL ============
+
+model AIConfig {
+  id          String   @id @default(cuid())
+  featureKey  String   @unique // 'summary', 'qa', 'explanation', 'chat'
+  name        String
+  description String?
+  enabled     Boolean  @default(true)
+  dailyLimit  Int      @default(10)
+  premiumOnly Boolean  @default(false)
+  settings    Json?    // Additional config like max tokens, etc.
+  updatedAt   DateTime @updatedAt
+}
+
+model AIRequestLog {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  featureKey String
+  inputSize  Int      // characters
+  outputSize Int      // characters
+  success    Boolean
+  errorMsg   String?
+  createdAt  DateTime @default(now())
+  
+  @@index([userId])
+  @@index([featureKey])
+  @@index([createdAt])
+}
+
+// ============ MONETIZATION & ADS ============
+
+model AdConfig {
+  id          String   @id @default(cuid())
+  placement   String   @unique // 'download_reward', 'resource_view_bottom', 'homepage_banner'
+  name        String
+  enabled     Boolean  @default(true)
+  adUnitId    String?  // Google AdSense unit ID
+  settings    Json?    // Additional config
+  updatedAt   DateTime @updatedAt
+}
+
+model AdImpression {
+  id         String   @id @default(cuid())
+  userId     String?
+  placement  String
+  completed  Boolean  @default(false) // For reward ads
+  revenue    Float    @default(0)
+  createdAt  DateTime @default(now())
+  
+  @@index([placement])
+  @@index([createdAt])
+}
+
+// ============ AUDIT LOGS ============
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  adminId     String
+  admin       User     @relation("AdminActions", fields: [adminId], references: [id])
+  action      String   // 'user_suspended', 'resource_deleted', 'setting_changed'
+  targetType  String   // 'user', 'resource', 'setting'
+  targetId    String?
+  details     Json?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+  
+  @@index([adminId])
+  @@index([action])
+  @@index([targetType])
+  @@index([createdAt])
+}
+
+// ============ ANNOUNCEMENTS ============
+
+model Announcement {
+  id        String    @id @default(cuid())
+  title     String
+  message   String    @db.Text
+  type      String    @default("info") // info, warning, update, promotion
+  target    String    @default("all")  // all, premium, free_users
+  isActive  Boolean   @default(true)
+  expiresAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  
+  @@index([isActive])
+  @@index([target])
+}
+
+// ============ SUPPORT & HELPDESK ============
+
+model SupportTicket {
+  id          String         @id @default(cuid())
+  userId      String
+  user        User           @relation("UserTickets", fields: [userId], references: [id])
+  subject     String
+  status      TicketStatus   @default(OPEN)
+  priority    TicketPriority @default(NORMAL)
+  messages    TicketMessage[]
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  
+  @@index([userId])
+  @@index([status])
+  @@index([priority])
+}
+
+model TicketMessage {
+  id        String        @id @default(cuid())
+  ticketId  String
+  ticket    SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User          @relation(fields: [senderId], references: [id])
+  message   String        @db.Text
+  isAdmin   Boolean       @default(false)
+  createdAt DateTime      @default(now())
+  
+  @@index([ticketId])
+}
+
+model FAQ {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String   @db.Text
+  category  String
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([category])
+  @@index([isActive])
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
