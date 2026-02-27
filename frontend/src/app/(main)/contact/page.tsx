@@ -77,7 +77,7 @@ export default function ContactPage() {
 
     const contactInfo = [
         { icon: <MailIcon size={24} />, label: 'Email', value: 'admin@noteveda.com', href: 'mailto:admin@noteveda.com' },
-        { icon: <PhoneIcon size={24} />, label: 'Phone', value: '+91 98765 43210', href: 'tel:+919152552266' },
+        { icon: <PhoneIcon size={24} />, label: 'Phone', value: '+91 9152552266', href: 'tel:+919152552266' },
         { icon: <MapPinIcon size={24} />, label: 'Location', value: 'Navi Mumbai, India', href: null },
         { icon: <ClockIcon size={24} />, label: 'Response Time', value: 'Within 24 hours', href: null },
     ];
