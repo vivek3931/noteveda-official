@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
-import { MenuIcon, SearchIcon, MessageSquareIcon, BellIcon, UserIcon, LogOutIcon, ChevronRightIcon, CompassIcon } from '@/components/icons'; // Ensure strictly existing icons
+import { MenuIcon, SearchIcon, MessageIcon, BellIcon, UserIcon, LogOutIcon, ChevronRightIcon, CompassIcon } from '@/components/icons'; // Ensure strictly existing icons
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface AdminHeaderProps {

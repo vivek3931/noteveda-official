@@ -244,6 +244,7 @@ export interface AIConfig {
     id: string;
     featureKey: string; // 'summary', 'qa', 'explanation', 'chat'
     name: string;
+    description?: string;
     enabled: boolean;
     dailyLimit: number;
     premiumOnly: boolean;

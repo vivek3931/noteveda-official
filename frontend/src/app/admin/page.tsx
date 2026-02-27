@@ -1797,8 +1797,8 @@ function AdminDashboardContent() {
                                                     </div>
                                                     <div className="pt-4 border-t border-gray-100 dark:border-gray-700 flex justify-between items-center text-xs text-gray-500">
                                                         <span>ID: {plan.id.substring(0, 8)}...</span>
-                                                        <span className={`px-2 py-1 rounded-full ${plan.active ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600'}`}>
-                                                            {plan.active ? 'Active' : 'Inactive'}
+                                                        <span className={`px-2 py-1 rounded-full ${plan.isActive ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600'}`}>
+                                                            {plan.isActive ? 'Active' : 'Inactive'}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -2323,7 +2323,7 @@ function AdminDashboardContent() {
                                                                 className={`p-4 border-b border-gray-100 dark:border-gray-700 cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors ${selectedTicket?.id === ticket.id ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-l-blue-500' : ''}`}
                                                             >
                                                                 <div className="flex justify-between items-start mb-1">
-                                                                    <span className={`px-1.5 py-0.5 text-[10px] uppercase font-bold rounded ${ticket.status === 'OPEN' ? 'bg-green-100 text-green-700' : ticket.status === 'URGENT' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
+                                                                    <span className={`px-1.5 py-0.5 text-[10px] uppercase font-bold rounded ${ticket.status === 'OPEN' ? 'bg-green-100 text-green-700' : ticket.priority === 'URGENT' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
                                                                         {ticket.status}
                                                                     </span>
                                                                     <span className="text-xs text-gray-400">{new Date(ticket.createdAt).toLocaleDateString()}</span>
