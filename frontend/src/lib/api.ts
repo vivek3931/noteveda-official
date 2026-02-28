@@ -1,7 +1,18 @@
 // API Client for Noteveda Frontend
 // Centralized API configuration and helper functions
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || '';
+// In production (browser on a real domain), use relative URLs so requests go through
+// the Next.js rewrite proxy → same-origin cookies. In dev (localhost), use the env var.
+export function getApiBaseUrl(): string {
+    if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
+        // Production: use relative URL → Next.js rewrites proxy to backend
+        return '';
+    }
+    // Development or SSR: use the environment variable
+    return process.env.NEXT_PUBLIC_API_URL || '';
+}
+
+const API_BASE_URL = getApiBaseUrl();
 
 interface CustomRequestInit extends RequestInit {
     _retry?: boolean;

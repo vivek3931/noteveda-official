@@ -1,4 +1,4 @@
-import api, { getCsrfToken } from '../api';
+import api, { getCsrfToken, getApiBaseUrl } from '../api';
 
 interface ChatResponse {
     role: 'ai' | 'user';
@@ -30,7 +30,7 @@ export const aiService = {
             headers['X-CSRF-TOKEN'] = csrfToken;
         }
 
-        const url = `${process.env.NEXT_PUBLIC_API_URL || ''}/ai/stream`;
+        const url = `${getApiBaseUrl()}/ai/stream`;
         console.log('[AI Stream] Connecting to:', url);
 
         const response = await fetch(url, {

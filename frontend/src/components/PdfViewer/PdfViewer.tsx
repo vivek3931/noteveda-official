@@ -6,8 +6,9 @@ import { usePDFEngineStore } from '@/lib/pdf-engine/PDFEngineStore';
 import PdfPage from './PdfPage';
 import InnerPdfToolbar from './InnerPdfToolbar';
 import MobileBottomBar from './MobileBottomBar';
+import { getApiBaseUrl } from '@/lib/api';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
+const API_BASE = getApiBaseUrl();
 
 interface PdfMetadata {
     totalPages: number;

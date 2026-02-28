@@ -1,6 +1,7 @@
 import React, { useEffect, useState, memo, useMemo } from 'react';
+import { getApiBaseUrl } from '@/lib/api';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || '';
+const API_BASE = getApiBaseUrl();
 
 // URL detection regex
 const URL_REGEX = /^(https?:\/\/[^\s]+|www\.[^\s]+|[a-zA-Z0-9.-]+\.(com|org|net|edu|gov|io|co|app)[^\s]*)$/i;

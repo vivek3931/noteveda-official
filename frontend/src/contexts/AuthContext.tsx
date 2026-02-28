@@ -31,9 +31,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 // If this call succeeds, we are logged in.
                 const currentUser = await authService.getMe();
                 setUser(currentUser);
+                // Ensure the frontend-domain cookie is set for middleware
+                document.cookie = 'is_authenticated=true; path=/; max-age=604800; SameSite=Lax';
             } catch (error) {
                 // If 401 or network error, assume logged out
                 setUser(null);
+                // Clear the frontend-domain auth cookie
+                document.cookie = 'is_authenticated=; Max-Age=0; path=/;';
 
                 // Bootstrap CSRF token for guest users (Login needs it)
                 try {
@@ -53,12 +57,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
             const response = await authService.login(credentials);
             setUser(response.user);
+            // Set is_authenticated cookie on the frontend domain so Next.js middleware can read it.
+            // The backend also sets this cookie, but it's on the backend's domain (cross-origin).
+            document.cookie = 'is_authenticated=true; path=/; max-age=604800; SameSite=Lax';
         } catch (error: any) {
             // If CSRF token is invalid/missing, re-fetch and retry once
             if (error?.message?.includes('CSRF')) {
                 await authService.getCsrfToken();
                 const response = await authService.login(credentials);
                 setUser(response.user);
+                document.cookie = 'is_authenticated=true; path=/; max-age=604800; SameSite=Lax';
                 return;
             }
             throw error;
@@ -69,11 +77,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         try {
             const response = await authService.register(data);
             setUser(response.user);
+            // Set is_authenticated cookie on the frontend domain
+            document.cookie = 'is_authenticated=true; path=/; max-age=604800; SameSite=Lax';
         } catch (error: any) {
             if (error?.message?.includes('CSRF')) {
                 await authService.getCsrfToken();
                 const response = await authService.register(data);
                 setUser(response.user);
+                document.cookie = 'is_authenticated=true; path=/; max-age=604800; SameSite=Lax';
                 return;
             }
             throw error;
@@ -87,6 +98,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             console.error('Logout error:', error);
         } finally {
             setUser(null);
+            // Clear the frontend-domain auth cookie
+            document.cookie = 'is_authenticated=; Max-Age=0; path=/;';
             router.push('/login');
             router.refresh();
         }
