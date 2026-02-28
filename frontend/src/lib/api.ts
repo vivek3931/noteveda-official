@@ -75,7 +75,7 @@ async function fetchAPI<T>(
         const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
         // Handle 401 Unauthorized (Token Expired)
-        if (response.status === 401 && !options._retry && !endpoint.includes('/auth/login') && !endpoint.includes('/auth/refresh')) {
+        if (response.status === 401 && !options._retry && !endpoint.includes('/auth/login') && !endpoint.includes('/auth/register') && !endpoint.includes('/auth/refresh')) {
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
