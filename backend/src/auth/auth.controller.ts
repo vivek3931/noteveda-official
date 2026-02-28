@@ -20,8 +20,9 @@ export class AuthController {
     // Helper to set cookies
     private setCookies(response: any, tokens: { accessToken: string; refreshToken: string }) {
         const isProd = process.env.NODE_ENV === 'production';
-        // Use 'none' in production for cross-origin (Vercel <-> Render), 'lax' locally
-        const sameSitePolicy = isProd ? 'none' as const : 'lax' as const;
+        // Use 'lax' everywhere — in production, cookies are same-origin via Next.js API proxy.
+        // No need for 'none' since the frontend proxies /api/* through its own domain.
+        const sameSitePolicy = 'lax' as const;
 
         response.cookie('access_token', tokens.accessToken, {
             httpOnly: true,
@@ -35,7 +36,7 @@ export class AuthController {
             httpOnly: true,
             secure: isProd,
             sameSite: sameSitePolicy,
-            path: '/api/auth/refresh', // Scoped to refresh endpoint
+            path: '/', // Use root path so it's sent with all proxied requests
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7d
         });
 
@@ -69,12 +70,11 @@ export class AuthController {
     getCsrfToken(@Res({ passthrough: true }) response: any) {
         const csrfToken = crypto.randomUUID();
         const isProd = process.env.NODE_ENV === 'production';
-        const sameSitePolicy = isProd ? 'none' as const : 'lax' as const;
 
         response.cookie('csrf_token', csrfToken, {
             httpOnly: false,
             secure: isProd,
-            sameSite: sameSitePolicy,
+            sameSite: 'lax' as const,
             path: '/',
         });
 
@@ -151,16 +151,15 @@ export class AuthController {
 
         // Clear all cookies
         const isProd = process.env.NODE_ENV === 'production';
-        const sameSitePolicy = isProd ? 'none' as const : 'lax' as const;
         const clearOptions = {
             httpOnly: true,
             secure: isProd,
-            sameSite: sameSitePolicy,
+            sameSite: 'lax' as const,
             path: '/',
         };
 
         response.clearCookie('access_token', clearOptions);
-        response.clearCookie('refresh_token', { ...clearOptions, path: '/api/auth/refresh' });
+        response.clearCookie('refresh_token', clearOptions);
         response.clearCookie('csrf_token', { ...clearOptions, httpOnly: false });
         response.clearCookie('is_authenticated', { ...clearOptions, httpOnly: false });
 
