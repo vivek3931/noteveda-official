@@ -14,7 +14,7 @@
 
 **A modern, community-driven platform for sharing and discovering academic resources**
 
-[Live Demo](#) • [API Docs](#api-documentation) • [Getting Started](#-getting-started)
+[Live Demo](https://noteveda.com) • [API Docs](#api-documentation) • [Getting Started](#-getting-started)
 
 <br/>
 
