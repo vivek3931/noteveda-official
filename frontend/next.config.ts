@@ -1,5 +1,19 @@
 import type { NextConfig } from "next";
 
+// Backend URL for API proxy rewrites (server-side only, not exposed to client)
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+const isProd = process.env.NODE_ENV === 'production';
+
+// Build CSP dynamically based on environment
+const connectSrc = isProd
+  ? "'self' https:"
+  : `'self' http://localhost:5000 https:`;
+const imgSrc = isProd
+  ? "'self' data: blob: https:"
+  : "'self' data: blob: https: http://localhost:5000";
+
+const cspValue = `default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src ${imgSrc}; connect-src ${connectSrc}; frame-src 'self' https://api.razorpay.com;`;
+
 const nextConfig: NextConfig = {
   // Security Headers
   async headers() {
@@ -35,9 +49,22 @@ const nextConfig: NextConfig = {
           // Content Security Policy
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://checkout.razorpay.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https: http://localhost:5000; connect-src 'self' http://localhost:5000 https:; frame-src 'self' https://api.razorpay.com;",
+            value: cspValue,
           },
         ],
+      },
+    ];
+  },
+
+  // API Proxy Rewrites — makes API calls same-origin so cookies work reliably.
+  // In production: frontend calls /api/... → rewritten to Render backend.
+  // In local dev: NEXT_PUBLIC_API_URL points directly to localhost:5000/api,
+  //               so these rewrites are only used as a fallback.
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${BACKEND_URL}/api/:path*`,
       },
     ];
   },

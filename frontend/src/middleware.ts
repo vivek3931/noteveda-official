@@ -9,7 +9,7 @@ export function middleware(request: NextRequest) {
 
     const { pathname } = request.nextUrl;
 
-    // 2. Exclude Static Assets and API Routes
+    // 2. Exclude Static Assets and API Routes (API routes are handled by Next.js rewrites)
     if (
         pathname.startsWith('/_next') ||
         pathname.startsWith('/static') ||
@@ -20,8 +20,10 @@ export function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
-    // 3. Get Auth State Hint (using is_authenticated cookie as refresh_token is path-scoped)
-    const isAuthenticated = request.cookies.has('is_authenticated');
+    // 3. Get Auth State Hint
+    // Check both is_authenticated and access_token cookies as auth signals.
+    // With same-origin API proxy, cookies are first-party and reliably stored.
+    const isAuthenticated = request.cookies.has('is_authenticated') || request.cookies.has('access_token');
 
     // 4. Guest Paths Logic (Login/Register)
     // If authenticated (has token hint), redirect to Dashboard
