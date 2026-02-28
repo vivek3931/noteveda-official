@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './strategies';
+import { CsrfTokenStore } from './services/csrf-token-store.service';
 
 @Module({
     imports: [
@@ -21,7 +22,8 @@ import { JwtStrategy } from './strategies';
         }),
     ],
     controllers: [AuthController],
-    providers: [AuthService, JwtStrategy],
-    exports: [AuthService, JwtStrategy],
+    providers: [AuthService, JwtStrategy, CsrfTokenStore],
+    exports: [AuthService, JwtStrategy, CsrfTokenStore],
 })
 export class AuthModule { }
+

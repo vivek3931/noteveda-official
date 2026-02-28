@@ -6,12 +6,16 @@ import { RegisterDto, LoginDto, RefreshTokenDto, AuthResponseDto, UpdateProfileD
 import { Public } from './decorators';
 import { CurrentUser } from './decorators';
 import { CsrfGuard } from './guards/csrf.guard';
+import { CsrfTokenStore } from './services/csrf-token-store.service';
 import * as crypto from 'crypto';
 
 @ApiTags('Authentication')
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) { }
+    constructor(
+        private readonly authService: AuthService,
+        private readonly csrfTokenStore: CsrfTokenStore,
+    ) { }
 
     // Helper to set cookies
     private setCookies(response: any, tokens: { accessToken: string; refreshToken: string }) {
@@ -53,6 +57,9 @@ export class AuthController {
             path: '/',
         });
 
+        // Store server-side for cross-origin fallback
+        this.csrfTokenStore.store(csrfToken);
+
         return csrfToken;
     }
 
@@ -70,6 +77,9 @@ export class AuthController {
             sameSite: sameSitePolicy,
             path: '/',
         });
+
+        // Store server-side for cross-origin fallback
+        this.csrfTokenStore.store(csrfToken);
 
         return { csrfToken };
     }
