@@ -31,8 +31,12 @@ export function AIChatSheet({
 }: AIChatSheetProps) {
 
     // Lock body scroll when mobile sheet is open — preserves scroll position
+    // Guard: only run on actual mobile viewports (component is CSS-hidden on desktop but still mounted)
     useEffect(() => {
         if (variant !== 'sheet') return;
+        const isMobileViewport = window.innerWidth < 1024;
+        if (!isMobileViewport) return;
+
         if (isOpen) {
             const scrollY = window.scrollY;
             document.body.style.position = 'fixed';
@@ -54,15 +58,17 @@ export function AIChatSheet({
             }
         }
         return () => {
-            const scrollY = document.body.style.top;
-            document.body.style.position = '';
-            document.body.style.top = '';
-            document.body.style.left = '';
-            document.body.style.right = '';
-            document.body.style.overflow = '';
-            document.documentElement.style.overflow = '';
-            if (scrollY) {
-                window.scrollTo(0, parseInt(scrollY || '0') * -1);
+            if (document.body.style.position === 'fixed') {
+                const scrollY = document.body.style.top;
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.left = '';
+                document.body.style.right = '';
+                document.body.style.overflow = '';
+                document.documentElement.style.overflow = '';
+                if (scrollY) {
+                    window.scrollTo(0, parseInt(scrollY || '0') * -1);
+                }
             }
         };
     }, [isOpen, variant]);

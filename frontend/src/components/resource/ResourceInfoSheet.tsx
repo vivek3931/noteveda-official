@@ -139,9 +139,14 @@ export function ResourceInfoSheet({
         });
     };
 
-    // Lock body scroll when open (ONLY for modal) — preserves scroll position
+    // Lock body scroll when open (ONLY for modal on actual mobile screens)
+    // Note: This component is always mounted on desktop too (CSS-hidden via lg:hidden),
+    // so we must check viewport width to avoid triggering scroll lock on desktop.
     useEffect(() => {
         if (variant !== 'modal') return;
+        const isMobileViewport = window.innerWidth < 1024;
+        if (!isMobileViewport) return;
+
         if (isOpen) {
             const scrollY = window.scrollY;
             document.body.style.position = 'fixed';
@@ -161,14 +166,16 @@ export function ResourceInfoSheet({
             }
         }
         return () => {
-            const scrollY = document.body.style.top;
-            document.body.style.position = '';
-            document.body.style.top = '';
-            document.body.style.left = '';
-            document.body.style.right = '';
-            document.body.style.overflow = '';
-            if (scrollY) {
-                window.scrollTo(0, parseInt(scrollY || '0') * -1);
+            if (document.body.style.position === 'fixed') {
+                const scrollY = document.body.style.top;
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.left = '';
+                document.body.style.right = '';
+                document.body.style.overflow = '';
+                if (scrollY) {
+                    window.scrollTo(0, parseInt(scrollY || '0') * -1);
+                }
             }
         };
     }, [isOpen, variant]);
