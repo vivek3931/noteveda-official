@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useCallback, Suspense } from 'react';
+import React, { useMemo, useCallback, Suspense, useEffect, useRef } from 'react';
 import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ResourceCard } from '@/components/features';
@@ -25,6 +25,15 @@ function BrowsePageContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
+
+    // Scroll to top on initial mount (e.g. navigating from home page category cards)
+    const hasScrolledRef = useRef(false);
+    useEffect(() => {
+        if (!hasScrolledRef.current) {
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' as ScrollBehavior });
+            hasScrolledRef.current = true;
+        }
+    }, []);
 
     // Parse and sanitize URL params using the validator
     const filters = useMemo(() => {

@@ -8,11 +8,12 @@
  * - Click-based zoom dropdown (not hover)
  * - Fit-width reset button
  * - Fully accessible keyboard navigation
+ * - Responsive mobile-first layout with proper touch targets
  */
 
 'use client';
 
-import React, { useState, useCallback, useEffect, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePDFEngineStore } from '../../lib/pdf-engine/PDFEngineStore';
 
@@ -221,7 +222,22 @@ export default function PDFToolbar({
         setTimeout(() => pageInputRef.current?.select(), 50);
     }, [currentPage]);
 
+    // ── Memoized toolbar container classes ──
+    const toolbarClasses = useMemo(() => `
+        w-auto inline-flex items-center
+        ${isMobile ? 'gap-0.5 px-1 py-0.5' : 'gap-1 px-1.5 py-1'}
+        bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl
+        border border-gray-200/60 dark:border-gray-700/50
+        shadow-[0_4px_24px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)]
+        rounded-2xl
+        ${className}
+    `, [isMobile, className]);
+
     if (!isVisible) return null;
+
+    // ── Determine which tools to show based on space ──
+    const showRotate = !isMobile;
+    const showFitWidth = !isMobile && userScale !== 1;
 
     // ─────────────────────────────────────────────────────────────────────────
     // RENDER
@@ -234,18 +250,11 @@ export default function PDFToolbar({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: isMobile ? 16 : -16, scale: 0.97 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                className={`
-                    w-auto inline-flex items-center gap-1 px-1.5 py-1
-                    bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl
-                    border border-gray-200/60 dark:border-gray-700/50
-                    shadow-[0_4px_24px_rgba(0,0,0,0.08)] dark:shadow-[0_4px_24px_rgba(0,0,0,0.3)]
-                    rounded-2xl
-                    ${className}
-                `}
+                className={toolbarClasses}
             >
                 {/* ── PAGE INDICATOR (click to jump) ── */}
                 {(!isMobile || !showSearch) && (
-                    <div className="flex items-center gap-0.5 px-2 border-r border-gray-200/60 dark:border-gray-700/40 mr-0.5">
+                    <div className={`flex items-center gap-0.5 border-r border-gray-200/60 dark:border-gray-700/40 ${isMobile ? 'px-1.5 mr-0' : 'px-2 mr-0.5'}`}>
                         {isEditingPage ? (
                             <form
                                 onSubmit={(e) => { e.preventDefault(); handlePageSubmit(); }}
@@ -267,7 +276,7 @@ export default function PDFToolbar({
                         ) : (
                             <button
                                 onClick={startPageEdit}
-                                className="flex items-center gap-1 py-0.5 px-0.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group"
+                                className={`flex items-center gap-1 py-0.5 px-0.5 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors group ${isMobile ? 'min-h-[36px]' : ''}`}
                                 title="Click to jump to page"
                             >
                                 <span className="text-xs font-semibold text-gray-900 dark:text-white tabular-nums min-w-[2ch] text-center group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
@@ -286,7 +295,7 @@ export default function PDFToolbar({
                             <motion.form
                                 key="search-open"
                                 initial={{ width: 36, opacity: 0 }}
-                                animate={{ width: isMobile ? 170 : 220, opacity: 1 }}
+                                animate={{ width: isMobile ? 160 : 220, opacity: 1 }}
                                 exit={{ width: 36, opacity: 0 }}
                                 transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                                 onSubmit={handleSearchSubmit}
@@ -299,7 +308,7 @@ export default function PDFToolbar({
                                         value={localSearchQuery}
                                         onChange={(e) => setLocalSearchQuery(e.target.value)}
                                         placeholder="Find in document..."
-                                        className="w-full pl-7 pr-14 py-1.5 text-xs bg-gray-100 dark:bg-gray-800 border-transparent focus:border-violet-500 ring-0 focus:ring-0 rounded-xl transition-all text-gray-900 dark:text-gray-100 placeholder:text-gray-400"
+                                        className={`w-full pl-7 pr-14 text-xs bg-gray-100 dark:bg-gray-800 border-transparent focus:border-violet-500 ring-0 focus:ring-0 rounded-xl transition-all text-gray-900 dark:text-gray-100 placeholder:text-gray-400 ${isMobile ? 'py-2' : 'py-1.5'}`}
                                     />
                                     <div className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400">
                                         <SearchIcon />
@@ -334,7 +343,7 @@ export default function PDFToolbar({
                                 exit={{ opacity: 0, scale: 0.8 }}
                                 transition={{ duration: 0.15 }}
                                 onClick={() => setShowSearch(true)}
-                                className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+                                className={`flex items-center justify-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors ${isMobile ? 'w-9 h-9' : 'w-8 h-8'}`}
                                 title="Search (Ctrl+F)"
                             >
                                 <SearchIcon />
@@ -346,15 +355,17 @@ export default function PDFToolbar({
                 {/* ── TOOLS (hidden when search is expanded on mobile) ── */}
                 {(!isMobile || !showSearch) && (
                     <div className="flex items-center gap-0.5 pl-0.5">
-                        {/* Rotate */}
-                        <ToolButton onClick={rotate} title="Rotate">
-                            <RotateIcon />
-                        </ToolButton>
+                        {/* Rotate — desktop only to save mobile space */}
+                        {showRotate && (
+                            <ToolButton onClick={rotate} title="Rotate" isMobile={isMobile}>
+                                <RotateIcon />
+                            </ToolButton>
+                        )}
 
-                        <Divider />
+                        {showRotate && <Divider />}
 
                         {/* Zoom Out */}
-                        <ToolButton onClick={zoomOut} disabled={userScale <= 0.5} title="Zoom Out (-)">
+                        <ToolButton onClick={zoomOut} disabled={userScale <= 0.5} title="Zoom Out (-)" isMobile={isMobile}>
                             <MinusIcon />
                         </ToolButton>
 
@@ -363,7 +374,8 @@ export default function PDFToolbar({
                             <button
                                 onClick={() => setShowZoomMenu(v => !v)}
                                 className={`
-                                    min-w-[3rem] px-1.5 py-1 text-[11px] font-semibold rounded-lg transition-all tabular-nums
+                                    min-w-[3.25rem] px-1.5 py-1 text-[11px] font-semibold rounded-lg transition-all tabular-nums
+                                    ${isMobile ? 'min-h-[36px]' : ''}
                                     ${showZoomMenu
                                         ? 'bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400'
                                         : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -381,12 +393,15 @@ export default function PDFToolbar({
                                         animate={{ opacity: 1, scale: 1, y: 0 }}
                                         exit={{ opacity: 0, scale: 0.95, y: 4 }}
                                         transition={{ duration: 0.12 }}
-                                        className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-24 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl py-1 overflow-hidden"
+                                        className={`absolute mb-2 w-28 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-xl py-1 overflow-hidden z-50 ${isMobile
+                                                ? 'bottom-full left-1/2 -translate-x-1/2'
+                                                : 'bottom-full left-1/2 -translate-x-1/2'
+                                            }`}
                                     >
                                         {/* Fit Width */}
                                         <button
                                             onClick={() => { resetUserScale(); setShowZoomMenu(false); }}
-                                            className="w-full px-3 py-1.5 text-left text-[11px] font-medium text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors flex items-center gap-1.5"
+                                            className="w-full px-3 py-2 text-left text-[11px] font-medium text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors flex items-center gap-1.5"
                                         >
                                             <FitWidthIcon />
                                             Fit width
@@ -396,9 +411,9 @@ export default function PDFToolbar({
                                             <button
                                                 key={value}
                                                 onClick={() => { setUserScale(value); setShowZoomMenu(false); }}
-                                                className={`w-full px-3 py-1.5 text-center text-[11px] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${Math.abs(userScale - value) < 0.01
-                                                        ? 'text-violet-600 dark:text-violet-400 font-bold bg-violet-50/50 dark:bg-violet-900/10'
-                                                        : 'text-gray-600 dark:text-gray-400'
+                                                className={`w-full px-3 py-2 text-center text-[11px] hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors ${Math.abs(userScale - value) < 0.01
+                                                    ? 'text-violet-600 dark:text-violet-400 font-bold bg-violet-50/50 dark:bg-violet-900/10'
+                                                    : 'text-gray-600 dark:text-gray-400'
                                                     }`}
                                             >
                                                 {label}
@@ -410,15 +425,15 @@ export default function PDFToolbar({
                         </div>
 
                         {/* Zoom In */}
-                        <ToolButton onClick={zoomIn} disabled={userScale >= 3} title="Zoom In (+)">
+                        <ToolButton onClick={zoomIn} disabled={userScale >= 3} title="Zoom In (+)" isMobile={isMobile}>
                             <PlusIcon />
                         </ToolButton>
 
-                        {/* Fit Width shortcut (desktop only) */}
-                        {!isMobile && userScale !== 1 && (
+                        {/* Fit Width shortcut (desktop only, when zoomed) */}
+                        {showFitWidth && (
                             <>
                                 <Divider />
-                                <ToolButton onClick={resetUserScale} title="Fit to Width">
+                                <ToolButton onClick={resetUserScale} title="Fit to Width" isMobile={isMobile}>
                                     <FitWidthIcon />
                                 </ToolButton>
                             </>
@@ -428,7 +443,7 @@ export default function PDFToolbar({
                         {onToggleFullscreen && (
                             <>
                                 <Divider />
-                                <ToolButton onClick={onToggleFullscreen} title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'}>
+                                <ToolButton onClick={onToggleFullscreen} title={isFullscreen ? 'Exit Fullscreen' : 'Fullscreen'} isMobile={isMobile}>
                                     {isFullscreen ? <MinimizeIcon /> : <MaximizeIcon />}
                                 </ToolButton>
                             </>
@@ -448,18 +463,21 @@ function ToolButton({
     disabled,
     title,
     children,
+    isMobile = false,
 }: {
     onClick: () => void;
     disabled?: boolean;
     title: string;
     children: React.ReactNode;
+    isMobile?: boolean;
 }) {
     return (
         <button
             onClick={onClick}
             disabled={disabled}
             title={title}
-            className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl disabled:opacity-30 transition-colors active:scale-95"
+            className={`flex items-center justify-center text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl disabled:opacity-30 transition-colors active:scale-95 ${isMobile ? 'w-9 h-9' : 'w-8 h-8'
+                }`}
         >
             {children}
         </button>

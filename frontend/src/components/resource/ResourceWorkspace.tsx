@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePDFEngineStore } from '@/lib/pdf-engine/PDFEngineStore';
 import { Resource } from '@/types';
@@ -163,14 +163,29 @@ export function ResourceWorkspace({
     }, []);
 
     // ── Helpers ──
-    const toggleTab = (tab: 'info' | 'related' | 'saved') => {
+    const toggleTab = useCallback((tab: 'info' | 'related' | 'saved') => {
         setActiveTab(current => current === tab ? null : tab);
-    };
+    }, []);
 
-    const closeAIChat = () => {
+    const closeAIChat = useCallback(() => {
         setShowAIChat(false);
         setAiPrompt(undefined);
-    };
+    }, []);
+
+    // ── Keyboard Shortcuts ──
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                if (showAIChat) {
+                    closeAIChat();
+                } else if (activeTab) {
+                    setActiveTab(null);
+                }
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [showAIChat, activeTab, closeAIChat]);
 
     // ── Derived ──
     const subjectLabel = resource?.subject || resource?.domain || '';
@@ -226,8 +241,8 @@ export function ResourceWorkspace({
                                     title="Ask AI"
                                 >
                                     <div className={`w-8 h-8 rounded-full bg-white dark:bg-white flex items-center justify-center shadow-sm overflow-hidden border transition-all ${showAIChat
-                                            ? 'border-violet-400 shadow-violet-200 dark:shadow-violet-900/40'
-                                            : 'border-gray-200 dark:border-gray-700 group-hover:border-violet-400 group-hover:shadow-md'
+                                        ? 'border-violet-400 shadow-violet-200 dark:shadow-violet-900/40'
+                                        : 'border-gray-200 dark:border-gray-700 group-hover:border-violet-400 group-hover:shadow-md'
                                         }`}>
                                         <Image src="/noteveda_supermini.svg" alt="AI" width={18} height={18} className="w-[18px] h-[18px]" />
                                     </div>
@@ -342,8 +357,8 @@ export function ResourceWorkspace({
                                     onClick={onSave}
                                     disabled={isLoading}
                                     className={`w-8 h-8 flex items-center justify-center rounded-lg transition-all ${isSaved
-                                            ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400'
-                                            : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
+                                        ? 'bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400'
+                                        : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800'
                                         }`}
                                     title={isSaved ? 'Unsave' : 'Save'}
                                 >
@@ -380,8 +395,8 @@ export function ResourceWorkspace({
                                     disabled={isLoading}
                                     title="Ask AI"
                                     className={`ml-0.5 w-8 h-8 flex items-center justify-center rounded-full shadow-sm border transition-all ${showAIChat
-                                            ? 'bg-violet-50 dark:bg-violet-900/30 border-violet-300 dark:border-violet-700 text-violet-600'
-                                            : 'bg-white dark:bg-white border-gray-200 dark:border-gray-700 hover:border-violet-400 hover:shadow-md'
+                                        ? 'bg-violet-50 dark:bg-violet-900/30 border-violet-300 dark:border-violet-700 text-violet-600'
+                                        : 'bg-white dark:bg-white border-gray-200 dark:border-gray-700 hover:border-violet-400 hover:shadow-md'
                                         }`}
                                 >
                                     {showAIChat ? (

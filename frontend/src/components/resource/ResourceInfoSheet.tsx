@@ -92,8 +92,8 @@ function ResourceCard({ resource, isActive, variant }: {
             {/* Meta */}
             <div className="min-w-0 flex-1">
                 <p className={`text-sm font-medium truncate transition-colors ${isActive
-                        ? 'text-violet-700 dark:text-violet-300'
-                        : 'text-gray-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400'
+                    ? 'text-violet-700 dark:text-violet-300'
+                    : 'text-gray-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400'
                     }`}>
                     {resource.title}
                 </p>
@@ -139,18 +139,38 @@ export function ResourceInfoSheet({
         });
     };
 
-    // Lock body scroll when open (ONLY for modal)
+    // Lock body scroll when open (ONLY for modal) — preserves scroll position
     useEffect(() => {
-        if (variant === 'modal') {
-            if (isOpen) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = '';
+        if (variant !== 'modal') return;
+        if (isOpen) {
+            const scrollY = window.scrollY;
+            document.body.style.position = 'fixed';
+            document.body.style.top = `-${scrollY}px`;
+            document.body.style.left = '0';
+            document.body.style.right = '0';
+            document.body.style.overflow = 'hidden';
+        } else {
+            const scrollY = document.body.style.top;
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            document.body.style.right = '';
+            document.body.style.overflow = '';
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY || '0') * -1);
             }
-            return () => {
-                document.body.style.overflow = '';
-            };
         }
+        return () => {
+            const scrollY = document.body.style.top;
+            document.body.style.position = '';
+            document.body.style.top = '';
+            document.body.style.left = '';
+            document.body.style.right = '';
+            document.body.style.overflow = '';
+            if (scrollY) {
+                window.scrollTo(0, parseInt(scrollY || '0') * -1);
+            }
+        };
     }, [isOpen, variant]);
 
 
@@ -305,8 +325,8 @@ export function ResourceInfoSheet({
                     <div className="space-y-3">
                         {/* Status banner */}
                         <div className={`p-3 rounded-xl text-center text-sm ${isSaved
-                                ? 'bg-violet-50 dark:bg-violet-900/15 text-violet-600 dark:text-violet-400'
-                                : 'bg-gray-50 dark:bg-gray-800/40 text-gray-500 dark:text-gray-400'
+                            ? 'bg-violet-50 dark:bg-violet-900/15 text-violet-600 dark:text-violet-400'
+                            : 'bg-gray-50 dark:bg-gray-800/40 text-gray-500 dark:text-gray-400'
                             }`}>
                             {isSaved ? '✓ This resource is saved' : 'Save this resource to your library'}
                         </div>
@@ -342,8 +362,8 @@ export function ResourceInfoSheet({
                     <button
                         onClick={onSave}
                         className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl font-medium text-sm transition-colors ${isSaved
-                                ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
-                                : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                            ? 'bg-gray-900 dark:bg-white text-white dark:text-gray-900'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
                             }`}
                     >
                         <BookmarkIcon size={14} filled={isSaved} />

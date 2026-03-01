@@ -162,11 +162,21 @@ export default function ResourcePage() {
     // Handle error state
     if (resourceError && !resourceLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-950">
-                <div className="text-center">
-                    <DocumentIcon className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                    <p className="text-gray-500">Resource not found</p>
-                    <Link href="/browse" className="mt-4 inline-block text-violet-600 hover:underline">
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-6">
+                <div className="text-center max-w-sm">
+                    <div className="w-16 h-16 mx-auto mb-5 rounded-2xl bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                        <DocumentIcon className="w-7 h-7 text-gray-400 dark:text-gray-500" />
+                    </div>
+                    <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                        Resource not found
+                    </h2>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-6 leading-relaxed">
+                        This resource may have been removed or the link might be incorrect. Try browsing our collection instead.
+                    </p>
+                    <Link
+                        href="/browse"
+                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 dark:bg-white text-white dark:text-gray-900 font-medium text-sm rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
+                    >
                         Browse Resources
                     </Link>
                 </div>

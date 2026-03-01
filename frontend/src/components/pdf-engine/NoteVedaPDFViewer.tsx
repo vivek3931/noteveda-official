@@ -192,36 +192,44 @@ const NoteVedaPDFViewer = memo(function NoteVedaPDFViewer({
     }, [onAskAI, resourceActions, handleDismissMenu]);
 
     // ============================================
-    // HIGHLIGHT HANDLERS
+    // SHARED: Pixel-to-Percentage Rect Conversion
     // ============================================
-    const handleHighlight = useCallback(async (sel: SelectionInfo) => {
-        // Get viewport dimensions from PDF.js for percentage calculation (not DOM!)
+    /**
+     * computePercentageRects — Converts selection pixel rects to percentage-based rects
+     * relative to the PDF page container.
+     *
+     * Algorithm:
+     * 1. Prefer pre-calculated rects from TextLayer (most accurate).
+     * 2. Fallback: extract rects from browser Selection API.
+     * 3. Last resort: use the selection's bounding box.
+     * 4. Convert pixel coordinates to percentages using container/viewport dimensions.
+     */
+    const computePercentageRects = useCallback(async (
+        sel: SelectionInfo
+    ): Promise<HighlightRect[] | null> => {
         const page = await PDFEngine.getPage(sel.pageNumber);
-        if (!page) return;
+        if (!page) return null;
 
         const { baseScale, userScale } = usePDFEngineStore.getState();
         const viewport = page.getViewport({ scale: baseScale * userScale });
 
-        // Get page container for coordinate origin subtraction
         const pageContainer = document.getElementById(`pdf-page-${sel.pageNumber}`);
         const containerRect = pageContainer?.getBoundingClientRect();
 
         let pixelRects: Array<{ x: number; y: number; width: number; height: number }> = [];
 
-        // 1. Prefer pre-calculated rects from TextLayer (accurate)
+        // Step 1: Prefer pre-calculated rects from TextLayer
         if (sel.rects && sel.rects.length > 0) {
             pixelRects = sel.rects;
         }
-        // 2. Fallback to calculating from browser selection
+        // Step 2: Fallback to browser Selection API
         else {
             const browserSelection = window.getSelection();
             if (browserSelection && browserSelection.rangeCount > 0) {
                 const range = browserSelection.getRangeAt(0);
                 const clientRects = range.getClientRects();
-
                 for (let i = 0; i < clientRects.length; i++) {
                     const r = clientRects[i];
-                    // Subtract container offset to get local coordinates
                     pixelRects.push({
                         x: r.left - (containerRect?.left || 0),
                         y: r.top - (containerRect?.top || 0),
@@ -232,7 +240,7 @@ const NoteVedaPDFViewer = memo(function NoteVedaPDFViewer({
             }
         }
 
-        // 3. Last fallback: use the main selection bounding box
+        // Step 3: Last fallback — bounding box
         if (pixelRects.length === 0) {
             pixelRects.push({
                 x: sel.rect.x,
@@ -242,17 +250,24 @@ const NoteVedaPDFViewer = memo(function NoteVedaPDFViewer({
             });
         }
 
-        // Helper to get safe dimensions
+        // Step 4: Convert to percentages
         const cWidth = containerRect ? containerRect.width : viewport.width;
         const cHeight = containerRect ? containerRect.height : viewport.height;
 
-        // Convert pixel rects to percentage rects using container dimensions
-        const percentRects: HighlightRect[] = pixelRects.map(r => ({
+        return pixelRects.map(r => ({
             xPercent: (r.x / cWidth) * 100,
             yPercent: (r.y / cHeight) * 100,
             widthPercent: (r.width / cWidth) * 100,
             heightPercent: (r.height / cHeight) * 100,
         }));
+    }, []);
+
+    // ============================================
+    // HIGHLIGHT HANDLERS
+    // ============================================
+    const handleHighlight = useCallback(async (sel: SelectionInfo) => {
+        const percentRects = await computePercentageRects(sel);
+        if (!percentRects) return;
 
         addHighlight({
             pageNumber: sel.pageNumber,
@@ -263,65 +278,11 @@ const NoteVedaPDFViewer = memo(function NoteVedaPDFViewer({
         });
 
         handleDismissMenu();
-    }, [addHighlight, handleDismissMenu]);
+    }, [computePercentageRects, addHighlight, handleDismissMenu]);
 
     const handleAddNote = useCallback(async (sel: SelectionInfo) => {
-        // Get viewport dimensions from PDF.js for percentage calculation
-        const page = await PDFEngine.getPage(sel.pageNumber);
-        if (!page) return;
-
-        const { baseScale, userScale } = usePDFEngineStore.getState();
-        const viewport = page.getViewport({ scale: baseScale * userScale });
-
-        // Get page container for coordinate origin subtraction
-        const pageContainer = document.getElementById(`pdf-page-${sel.pageNumber}`);
-        const containerRect = pageContainer?.getBoundingClientRect();
-
-        let pixelRects: Array<{ x: number; y: number; width: number; height: number }> = [];
-
-        // 1. Prefer pre-calculated rects from TextLayer
-        if (sel.rects && sel.rects.length > 0) {
-            pixelRects = sel.rects;
-        }
-        // 2. Fallback
-        else {
-            const browserSelection = window.getSelection();
-            if (browserSelection && browserSelection.rangeCount > 0) {
-                const range = browserSelection.getRangeAt(0);
-                const clientRects = range.getClientRects();
-
-                for (let i = 0; i < clientRects.length; i++) {
-                    const r = clientRects[i];
-                    pixelRects.push({
-                        x: r.left - (containerRect?.left || 0),
-                        y: r.top - (containerRect?.top || 0),
-                        width: r.width,
-                        height: r.height,
-                    });
-                }
-            }
-        }
-
-        if (pixelRects.length === 0) {
-            pixelRects.push({
-                x: sel.rect.x,
-                y: sel.rect.y,
-                width: sel.rect.width,
-                height: sel.rect.height,
-            });
-        }
-
-        // Helper to get safe dimensions
-        const cWidth = containerRect ? containerRect.width : viewport.width;
-        const cHeight = containerRect ? containerRect.height : viewport.height;
-
-        // Convert pixel rects to percentage rects using container dimensions
-        const percentRects: HighlightRect[] = pixelRects.map(r => ({
-            xPercent: (r.x / cWidth) * 100,
-            yPercent: (r.y / cHeight) * 100,
-            widthPercent: (r.width / cWidth) * 100,
-            heightPercent: (r.height / cHeight) * 100,
-        }));
+        const percentRects = await computePercentageRects(sel);
+        if (!percentRects) return;
 
         // Create highlight with note flag
         const highlightId = addHighlight({
@@ -355,7 +316,7 @@ const NoteVedaPDFViewer = memo(function NoteVedaPDFViewer({
         });
 
         handleDismissMenu();
-    }, [addHighlight, addNote, handleDismissMenu]);
+    }, [computePercentageRects, addHighlight, addNote, handleDismissMenu]);
 
     const handleHighlightClick = useCallback(async (highlight: Highlight) => {
         const note = getNoteForHighlight(highlight.id);
@@ -456,7 +417,7 @@ const NoteVedaPDFViewer = memo(function NoteVedaPDFViewer({
                 if (resizeTimeoutRef.current) clearTimeout(resizeTimeoutRef.current);
                 resizeTimeoutRef.current = setTimeout(() => {
                     setIsResizing(false);
-                }, 200);
+                }, 300);
             }
         });
         obs.observe(containerRef.current);
@@ -591,10 +552,23 @@ const NoteVedaPDFViewer = memo(function NoteVedaPDFViewer({
                 )}
 
                 {error && !isLoading && (
-                    <div className="h-96 flex flex-col items-center justify-center text-red-500">
-                        <p>{error}</p>
-                        <button onClick={handleRetry} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
-                            Retry
+                    <div className="h-96 flex flex-col items-center justify-center gap-4 px-6">
+                        <div className="w-14 h-14 rounded-2xl bg-red-50 dark:bg-red-900/20 flex items-center justify-center">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-red-500 dark:text-red-400">
+                                <circle cx="12" cy="12" r="10" />
+                                <line x1="12" y1="8" x2="12" y2="12" />
+                                <line x1="12" y1="16" x2="12.01" y2="16" />
+                            </svg>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-sm font-semibold text-gray-900 dark:text-white mb-1">Failed to load document</p>
+                            <p className="text-xs text-gray-500 dark:text-gray-400 max-w-xs">{error}</p>
+                        </div>
+                        <button
+                            onClick={handleRetry}
+                            className="px-5 py-2 text-sm font-medium bg-gray-900 dark:bg-white text-white dark:text-gray-900 rounded-lg hover:bg-gray-800 dark:hover:bg-gray-100 transition-colors"
+                        >
+                            Try Again
                         </button>
                     </div>
                 )}
