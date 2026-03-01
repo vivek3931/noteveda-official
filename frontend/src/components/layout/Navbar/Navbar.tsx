@@ -429,7 +429,7 @@ const Navbar: React.FC = () => {
                             animate={{ opacity: 1 }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.2 }}
-                            className="fixed inset-0 z-[60] bg-black md:hidden"
+                            className="fixed inset-0 z-[60] bg-white dark:bg-black md:hidden"
                         >
                             <motion.nav
                                 initial={{ opacity: 0, y: 20 }}
@@ -439,12 +439,12 @@ const Navbar: React.FC = () => {
                                 className="flex flex-col h-full pt-24 px-8"
                             >
                                 {/* Mobile Nav Search */}
-                                <div className="flex items-center gap-3 px-4 py-3 mb-8 bg-gray-900 rounded-lg">
+                                <div className="flex items-center gap-3 px-4 py-3 mb-8 bg-gray-100 dark:bg-gray-900 rounded-lg">
                                     <SearchIcon size={20} className="text-gray-500" />
                                     <input
                                         type="text"
                                         placeholder="Search resources..."
-                                        className="flex-1 bg-transparent text-base text-white outline-none placeholder:text-gray-500"
+                                        className="flex-1 bg-transparent text-base text-gray-900 dark:text-white outline-none placeholder:text-gray-500"
                                         onKeyDown={(e) => {
                                             if (e.key === 'Enter') {
                                                 const value = (e.target as HTMLInputElement).value;
@@ -469,7 +469,7 @@ const Navbar: React.FC = () => {
                                             <Link
                                                 href={link.href}
                                                 onClick={() => setIsMenuOpen(false)}
-                                                className="block py-4 text-2xl font-semibold text-white hover:text-gray-300 transition-colors border-b border-gray-800"
+                                                className="block py-4 text-2xl font-semibold text-gray-900 dark:text-white hover:text-gray-600 dark:hover:text-gray-300 transition-colors border-b border-gray-200 dark:border-gray-800"
                                             >
                                                 {link.label}
                                             </Link>
@@ -489,7 +489,7 @@ const Navbar: React.FC = () => {
                                             <Link
                                                 href="/profile"
                                                 onClick={() => setIsMenuOpen(false)}
-                                                className="block py-4 text-center text-lg font-medium text-white border border-gray-700 rounded-xl hover:bg-gray-900 transition-colors"
+                                                className="block py-4 text-center text-lg font-medium text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
                                             >
                                                 My Profile
                                             </Link>
@@ -498,7 +498,7 @@ const Navbar: React.FC = () => {
                                                     handleLogout();
                                                     setIsMenuOpen(false);
                                                 }}
-                                                className="block w-full py-4 text-center text-lg font-semibold text-black bg-white rounded-xl hover:bg-gray-200 transition-colors"
+                                                className="block w-full py-4 text-center text-lg font-semibold text-white dark:text-black bg-black dark:bg-white rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
                                             >
                                                 Log Out
                                             </button>
@@ -508,14 +508,14 @@ const Navbar: React.FC = () => {
                                             <Link
                                                 href="/login"
                                                 onClick={() => setIsMenuOpen(false)}
-                                                className="block py-4 text-center text-lg font-medium text-white border border-gray-700 rounded-xl hover:bg-gray-900 transition-colors"
+                                                className="block py-4 text-center text-lg font-medium text-gray-900 dark:text-white border border-gray-300 dark:border-gray-700 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-900 transition-colors"
                                             >
                                                 Login
                                             </Link>
                                             <Link
                                                 href="/register"
                                                 onClick={() => setIsMenuOpen(false)}
-                                                className="block py-4 text-center text-lg font-semibold text-black bg-white rounded-xl hover:bg-gray-200 transition-colors"
+                                                className="block py-4 text-center text-lg font-semibold text-white dark:text-black bg-black dark:bg-white rounded-xl hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
                                             >
                                                 Get Started Free
                                             </Link>

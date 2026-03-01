@@ -68,7 +68,11 @@ function SavedPageContent() {
                         ))}
                     </div>
                 ) : savedCount > 0 ? (
-                    <SwiperResourceCarousel resources={savedResources} />
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                        {savedResources.map((resource: any, i: number) => (
+                            <ResourceCard key={resource.id} resource={resource} index={i} />
+                        ))}
+                    </div>
                 ) : (
                     <div
                         className="flex flex-col items-center justify-center py-20 text-center"

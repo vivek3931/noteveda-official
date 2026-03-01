@@ -92,10 +92,16 @@ function MyUploadsContent() {
                 </div>
             ) : userUploads.length > 0 ? (
                 <div className="max-w-7xl mx-auto px-6">
-                    <SwiperResourceCarousel
-                        resources={userUploads}
-                        onDelete={handleDeleteClick}
-                    />
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+                        {userUploads.map((resource: any, i: number) => (
+                            <ResourceCard
+                                key={resource.id}
+                                resource={resource}
+                                index={i}
+                                onDelete={() => handleDeleteClick(resource)}
+                            />
+                        ))}
+                    </div>
                 </div>
             ) : (
                 <div className="max-w-7xl mx-auto px-6">

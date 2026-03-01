@@ -45,42 +45,28 @@ const SwiperResourceCarousel: React.FC<SwiperResourceCarouselProps> = ({ resourc
                     nextEl: '.swiper-button-next-custom',
                 }}
                 breakpoints={{
-                    // Small screens: 2-3 cards depending on width
                     320: {
-                        slidesPerView: 1.2,
+                        slidesPerView: 2,
                         spaceBetween: 16
                     },
-                    480: {
-                        slidesPerView: 2.2,
-                        spaceBetween: 16
-                    },
-                    // Medium screens: 3 cards
                     640: {
-                        slidesPerView: 3.2,
+                        slidesPerView: 3,
                         spaceBetween: 16
                     },
-                    // Large screens: Match Browse (4-5 columns equivalent)
                     1024: {
-                        slidesPerView: 4.2,
-                        spaceBetween: 20
+                        slidesPerView: 4,
+                        spaceBetween: 16
                     },
                     1280: {
                         slidesPerView: 5,
-                        spaceBetween: 20
+                        spaceBetween: 16
                     }
                 }}
                 className="w-full !px-1 !py-4"
             >
                 {resources.map((resource, index) => (
-                    <SwiperSlide key={resource.id} className="!w-auto !h-auto d-flex">
-                        {/* 
-                            Slide width is defined here. 
-                            Mobile: 280px
-                            Tablet: 300px
-                            Desktop: 320px
-                            This matches the user's request for fixed dimensions similar to Browse page logic.
-                        */}
-                        <div className="w-[280px] sm:w-[300px] lg:w-[320px] h-full">
+                    <SwiperSlide key={resource.id} className="!w-auto !h-auto flex">
+                        <div className="w-full h-full">
                             <ResourceCard resource={resource} index={index} onDelete={onDelete ? () => onDelete(resource) : undefined} />
                         </div>
                     </SwiperSlide>
