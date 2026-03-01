@@ -107,11 +107,12 @@ function HeroSection() {
             <div className="absolute inset-0 z-0">
                 <div className="w-full h-full opacity-90 dark:opacity-70 filter blur-[0px]">
                     <Silk
-                        color={isDark ? '#7B7481' : '#D1D1D1'}
+                        color={isDark ? '#7B7481' : '#A1A1AA'}
                         speed={2}
                         scale={1}
                         noiseIntensity={1.4}
                         rotation={0}
+                        lightMode={!isDark}
                     />
                 </div>
             </div>
@@ -315,19 +316,19 @@ function CategoryDiscoverySection() {
                                     />
                                 </div>
 
-                                {/* Gradient Overlay - White in Light, Dark in Dark */}
-                                <div className="absolute inset-0 bg-gradient-to-t from-white/95 via-white/50 to-transparent dark:from-black/90 dark:via-black/50 dark:to-transparent" />
+                                {/* Gradient Overlay - Darker at bottom for text readability */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent dark:from-black/90 dark:via-black/50 dark:to-transparent" />
 
                                 {/* Content */}
                                 <div className="absolute inset-0 flex flex-col justify-end p-6 z-10 text-left">
                                     <div className="transform transition-transform duration-300 group-hover:-translate-y-1">
-                                        <span className="inline-block px-2 py-1 bg-black/5 dark:bg-white/10 backdrop-blur-md rounded border border-black/5 dark:border-white/5 text-gray-900 dark:text-white/90 text-[10px] font-semibold tracking-wider uppercase mb-2">
+                                        <span className="inline-block px-2 py-1 bg-white/10 dark:bg-white/10 backdrop-blur-md rounded border border-white/20 dark:border-white/5 text-white dark:text-white/90 text-[10px] font-semibold tracking-wider uppercase mb-2">
                                             {count > 0 ? `${count.toLocaleString()} Resources` : 'Explore'}
                                         </span>
-                                        <h3 className="text-gray-900 dark:text-white text-2xl font-bold mb-1 tracking-tight leading-none">
+                                        <h3 className="text-white dark:text-white text-2xl font-bold mb-1 tracking-tight leading-none">
                                             {config.label}
                                         </h3>
-                                        <p className="text-gray-600 dark:text-white/70 text-xs font-medium leading-relaxed max-w-[95%] mt-1">
+                                        <p className="text-white/80 dark:text-white/70 text-xs font-medium leading-relaxed max-w-[95%] mt-1">
                                             {config.description}
                                         </p>
                                     </div>
@@ -555,9 +556,9 @@ function AIFeatureHighlightsSection() {
     };
 
     return (
-        <section ref={sectionRef} className="py-24 bg-[#0A0A0F] overflow-hidden">
+        <section ref={sectionRef} className="py-16 md:py-24 bg-gray-50 dark:bg-[#0A0A0F] transition-colors duration-300 overflow-hidden">
             <div className="container mx-auto px-6">
-                <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+                <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                     {/* Left Side - Feature Info */}
                     <div className="order-2 lg:order-1">
                         <AnimatePresence mode="wait">
@@ -568,10 +569,10 @@ function AIFeatureHighlightsSection() {
                                 exit={{ opacity: 0, y: -20 }}
                                 transition={{ duration: 0.4 }}
                             >
-                                <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4 leading-tight">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 dark:text-white mb-4 leading-tight">
                                     {features[activeIndex].title}
                                 </h2>
-                                <p className="text-gray-500 text-lg md:text-xl leading-relaxed mb-8 max-w-md">
+                                <p className="text-gray-600 dark:text-gray-400 text-base md:text-lg lg:text-xl leading-relaxed mb-8 max-w-md">
                                     {features[activeIndex].description}
                                 </p>
                             </motion.div>
@@ -585,8 +586,8 @@ function AIFeatureHighlightsSection() {
                                     key={feature.id}
                                     onClick={() => setActiveIndex(i)}
                                     className={`h-1 rounded-full transition-all duration-500 ${i === activeIndex
-                                        ? 'bg-white w-16'
-                                        : 'bg-gray-700 hover:bg-gray-600 w-8'
+                                        ? 'bg-black dark:bg-white w-12 sm:w-16'
+                                        : 'bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 w-6 sm:w-8'
                                         }`}
                                 />
                             ))}
@@ -594,7 +595,7 @@ function AIFeatureHighlightsSection() {
                     </div>
 
                     {/* Right Side - Card Stack (Matching Reference Image) */}
-                    <div className="order-1 lg:order-2 relative h-[450px] md:h-[500px]">
+                    <div className="order-1 lg:order-2 relative h-[380px] sm:h-[450px] md:h-[500px] mt-6 lg:mt-0 w-full max-w-[calc(100vw-3rem)]">
                         {features.map((feature, i) => {
                             // Calculate offset: 0 = front, 1 = middle, 2 = back
                             const offset = (i - activeIndex + features.length) % features.length;
@@ -607,9 +608,9 @@ function AIFeatureHighlightsSection() {
                                     initial={false}
                                     animate={{
                                         // Stack goes UP and RIGHT (like reference image)
-                                        x: offset * 25,
-                                        y: offset * -20,
-                                        scale: 1 - offset * 0.03,
+                                        x: offset * 16,
+                                        y: offset * -16,
+                                        scale: 1 - offset * 0.04,
                                         zIndex: features.length - offset,
                                         opacity: offset > 2 ? 0 : 1,
                                     }}

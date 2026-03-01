@@ -10,6 +10,7 @@ interface SilkProps {
     color?: string;
     noiseIntensity?: number;
     rotation?: number;
+    lightMode?: boolean;
 }
 
 const hexToNormalizedRGB = (hex: string): [number, number, number] => {
@@ -45,6 +46,7 @@ uniform float uSpeed;
 uniform float uScale;
 uniform float uRotation;
 uniform float uNoiseIntensity;
+uniform float uLightMode;
 
 const float e = 2.71828182845904523536;
 
@@ -75,7 +77,16 @@ void main() {
                                    0.02 * tOffset) +
                            sin(20.0 * (tex.x + tex.y - 0.1 * tOffset)));
 
-  vec4 col = vec4(uColor, 1.0) * vec4(pattern) - rnd / 15.0 * uNoiseIntensity;
+  vec3 finalColor;
+  if (uLightMode > 0.5) {
+      // Enhance contrast for light mode
+      float lightPattern = smoothstep(0.2, 1.0, pattern);
+      finalColor = mix(vec3(1.0), uColor, lightPattern);
+  } else {
+      finalColor = uColor * pattern;
+  }
+
+  vec4 col = vec4(finalColor, 1.0) - rnd / 15.0 * uNoiseIntensity;
   col.a = 1.0;
   gl_FragColor = col;
 }
@@ -88,7 +99,8 @@ const SilkPlane: React.FC<SilkPlaneProps> = ({
     scale = 1,
     color = '#7B7481',
     noiseIntensity = 0.2,
-    rotation = 0
+    rotation = 0,
+    lightMode = false
 }) => {
     const meshRef = useRef<Mesh>(null!);
     const { viewport } = useThree();
@@ -109,6 +121,7 @@ const SilkPlane: React.FC<SilkPlaneProps> = ({
             uColor: { value: new Color(...hexToNormalizedRGB(color)) },
             uRotation: { value: rotation },
             uTime: { value: 0 },
+            uLightMode: { value: lightMode ? 1.0 : 0.0 },
         }),
         [] // Initialize once
     );
@@ -124,9 +137,10 @@ const SilkPlane: React.FC<SilkPlaneProps> = ({
                 material.uniforms.uNoiseIntensity.value = noiseIntensity;
                 material.uniforms.uColor.value.setRGB(...hexToNormalizedRGB(color));
                 material.uniforms.uRotation.value = rotation;
+                material.uniforms.uLightMode.value = lightMode ? 1.0 : 0.0;
             }
         }
-    }, [speed, scale, noiseIntensity, color, rotation]);
+    }, [speed, scale, noiseIntensity, color, rotation, lightMode]);
 
     useFrame((_, delta) => {
         if (meshRef.current) {

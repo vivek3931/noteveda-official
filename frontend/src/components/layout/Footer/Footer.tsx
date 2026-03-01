@@ -34,24 +34,31 @@ const Footer: React.FC = () => {
     if (isResourcePage) return null;
 
     return (
-        <footer className="bg-gray-950 text-white pt-16 pb-8">
+        <footer className="bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-white pt-16 pb-8 border-t border-gray-200 dark:border-gray-800 transition-colors duration-300">
             <div className="max-w-7xl mx-auto px-6">
                 {/* Main Footer Content */}
                 <div
-                    className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-gray-800"
+                    className="grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-gray-200 dark:border-gray-800"
                 >
                     {/* Brand Column */}
                     <div className="max-w-[280px]">
                         <Link href="/" className="inline-block mb-4">
                             <Image
+                                src="/noteveda.png"
+                                alt="Noteveda"
+                                width={150}
+                                height={40}
+                                className="w-[130px] h-auto dark:hidden"
+                            />
+                            <Image
                                 src="/noteveda_dark.png"
                                 alt="Noteveda"
                                 width={150}
                                 height={40}
-                                className="w-[130px] h-auto"
+                                className="w-[130px] h-auto hidden dark:block"
                             />
                         </Link>
-                        <p className="text-sm text-gray-400 leading-relaxed mb-6">
+                        <p className="text-sm text-gray-600 dark:text-gray-400 leading-relaxed mb-6">
                             Your gateway to premium academic resources. Study smarter, not harder.
                         </p>
                         <div className="flex gap-4">
@@ -59,9 +66,9 @@ const Footer: React.FC = () => {
                                 <motion.a
                                     key={social}
                                     href="#"
-                                    whileHover={{ scale: 1.1, backgroundColor: 'rgb(55, 65, 81)' }}
+                                    whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-800 text-gray-400 hover:text-white transition-colors"
+                                    className="flex items-center justify-center w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-800 text-gray-500 dark:text-gray-400 hover:text-black dark:hover:text-white hover:bg-gray-300 dark:hover:bg-gray-700 transition-colors"
                                     aria-label={social}
                                 >
                                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
@@ -82,11 +89,11 @@ const Footer: React.FC = () => {
 
                     {/* Resources Column */}
                     <div>
-                        <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Resources</h4>
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Resources</h4>
                         <ul className="flex flex-col gap-3">
                             {footerLinks.resources.map((link) => (
                                 <li key={link.href}>
-                                    <Link href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors">
+                                    <Link href={link.href} className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
                                         {link.label}
                                     </Link>
                                 </li>
@@ -96,11 +103,11 @@ const Footer: React.FC = () => {
 
                     {/* Company Column */}
                     <div>
-                        <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Company</h4>
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Company</h4>
                         <ul className="flex flex-col gap-3">
                             {footerLinks.company.map((link) => (
                                 <li key={link.href}>
-                                    <Link href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors">
+                                    <Link href={link.href} className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
                                         {link.label}
                                     </Link>
                                 </li>
@@ -110,11 +117,11 @@ const Footer: React.FC = () => {
 
                     {/* Legal Column */}
                     <div>
-                        <h4 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">Legal</h4>
+                        <h4 className="text-sm font-semibold text-gray-900 dark:text-white uppercase tracking-wider mb-4">Legal</h4>
                         <ul className="flex flex-col gap-3">
                             {footerLinks.legal.map((link) => (
                                 <li key={link.href}>
-                                    <Link href={link.href} className="text-sm text-gray-400 hover:text-white transition-colors">
+                                    <Link href={link.href} className="text-sm text-gray-600 dark:text-gray-400 hover:text-black dark:hover:text-white transition-colors">
                                         {link.label}
                                     </Link>
                                 </li>
@@ -125,10 +132,10 @@ const Footer: React.FC = () => {
 
                 {/* Bottom Bar */}
                 <div className="flex flex-col md:flex-row items-center justify-between gap-2 pt-8 text-center md:text-left">
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-gray-500 dark:text-gray-500">
                         © {currentYear} Noteveda. All rights reserved.
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-500 dark:text-gray-600">
                         Made with precision for students worldwide
                     </p>
                 </div>
